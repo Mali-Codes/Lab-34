@@ -246,32 +246,44 @@ int main() {
     // Create the computer network graph
     Graph network(edges, nodeNames);
 
-    // Display the network topology
-    network.printNetwork();
-
-    cout << endl;
-
-    // Perform network inspection using DFS from Main Server
-    network.inspectNetwork(0);
-
-    cout << endl;
-
-    // Analyze network coverage using BFS from Main Server
-    network.analyzeCoverage(0);
-
-    cout << endl;
-
-    // Find shortest paths using Dijkstra's algorithm from Main Server
-    network.dijkstra(0);
-
-    cout << endl;
-
-    // Find Minimum Spanning Tree using Prim's algorithm
-    network.primMST();
-
-    cout << endl;
+    int choice;
     
+    do {
+        cout << "\nComputer Network Menu:" << endl;
+        cout << "[1] Display computer network" << endl;
+        cout << "[2] Check network connectivity (BFS)" << endl;
+        cout << "[3] Plan inspection route (DFS)" << endl;
+        cout << "[4] Calculate shortest paths" << endl;
+        cout << "[5] Find Minimum Spanning Tree" << endl;
+        cout << "[0] Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
+        cout << endl;
+        
+        switch(choice) {
+            case 1:
+                network.printNetwork();
+                break;
+            case 2:
+                network.analyzeCoverage(0);
+                break;
+            case 3:
+                network.inspectNetwork(0);
+                break;
+            case 4:
+                network.dijkstra(0);
+                break;
+            case 5:
+                network.primMST();
+                break;
+            case 0:
+                cout << "Exiting program..." << endl;
+                break;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+        }
+        
+    } while(choice != 0);
+
     return 0;
 }
-
-// Step 4 complete
