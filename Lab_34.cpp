@@ -162,6 +162,61 @@ public:
         }
     }
 
+    void primMST() {
+        // Vector to store the parent of each node in MST
+        vector<int> parent(SIZE, -1);
+        
+        // Vector to store minimum weight edge to reach each node
+        vector<int> key(SIZE, INT_MAX);
+        
+        // Vector to track nodes included in MST
+        vector<bool> inMST(SIZE, false);
+        
+        // Priority queue: (weight, vertex)
+        priority_queue<Pair, vector<Pair>, greater<Pair>> pq;
+        
+        // Start from vertex 0
+        key[0] = 0;
+        pq.push(make_pair(0, 0));
+        
+        int totalCost = 0;
+        
+        while (!pq.empty()) {
+            int u = pq.top().second;
+            pq.pop();
+            
+            // Skip if already in MST
+            if (inMST[u]) continue;
+            
+            // Include vertex in MST
+            inMST[u] = true;
+            totalCost += key[u];
+            
+            // Check all adjacent vertices
+            for (auto &adjacent : adjList[u]) {
+                int v = adjacent.first;
+                int weight = adjacent.second;
+                
+                // If v is not in MST and weight is smaller than current key
+                if (!inMST[v] && weight < key[v]) {
+                    key[v] = weight;
+                    parent[v] = u;
+                    pq.push(make_pair(key[v], v));
+                }
+            }
+        }
+        
+        // Print the MST
+        cout << "Minimum Spanning Tree edges:" << endl;
+        
+        for (int i = 1; i < SIZE; i++) {
+            if (parent[i] != -1) {
+                cout << "Edge from " << parent[i] << " to " << i 
+                     << " with capacity: " << key[i] << " units" << endl;
+            }
+        }
+    }
+
 };
 
 int main() {
@@ -209,6 +264,13 @@ int main() {
     // Find shortest paths using Dijkstra's algorithm from Main Server
     network.dijkstra(0);
 
+    cout << endl;
+
+    // Find Minimum Spanning Tree using Prim's algorithm
+    network.primMST();
+
+    cout << endl;
+    
     return 0;
 }
 
