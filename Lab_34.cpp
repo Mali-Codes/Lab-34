@@ -15,12 +15,12 @@ typedef pair<int, int> Pair;
 class Graph {
 public:
     vector<vector<Pair>> adjList;
-    vector<string> junctionNames;
+    vector<string> nodeNames;
 
     // Graph Constructor
     Graph(vector<Edge> const &edges, vector<string> const &names) {
         adjList.resize(SIZE);
-        junctionNames = names;
+        nodeNames = names;
 
         for (auto &edge: edges) {
             int src = edge.src;
@@ -34,12 +34,12 @@ public:
 
     // Print the network topology
     void printNetwork() {
-        cout << "Water Pipeline Network Topology:" << endl;
+        cout << "Computer Network Topology:" << endl;
         cout << "======================================" << endl;
         for (int i = 0; i < adjList.size(); i++) {
-            cout << "Junction " << i << " (" << junctionNames[i] << ") connects to:" << endl;
+            cout << "Node " << i << " (" << nodeNames[i] << ") connects to:" << endl;
             for (Pair v : adjList[i])
-                cout << "  → Junction " << v.first << " (Capacity: " << v.second << " GPM)" << endl;
+                cout << "  → Node " << v.first << " (Latency: " << v.second << " ms)" << endl;
         }
     }
 
@@ -60,9 +60,9 @@ public:
     void inspectNetwork(int startVertex) {
         vector<bool> visited(SIZE, false);
 
-        cout << "Network Trace (DFS) from Junction " << startVertex 
-             << " (" << junctionNames[startVertex] << "):" << endl;
-        cout << "Purpose: Tracing possible contamination paths through the network" << endl;
+        cout << "Network Trace (DFS) from Node " << startVertex 
+             << " (" << nodeNames[startVertex] << "):" << endl;
+        cout << "Purpose: Tracing possible network paths for diagnostics" << endl;
         cout << "========================================" << endl;
         
         inspectNetworkUtil(startVertex, visited);
@@ -73,23 +73,23 @@ public:
     void inspectNetworkUtil(int vertex, vector<bool> &visited) {
         visited[vertex] = true;
         
-        cout << "Inspecting Junction " << vertex 
-             << " (" << junctionNames[vertex] << ")" << endl;
+        cout << "Inspecting Node " << vertex 
+             << " (" << nodeNames[vertex] << ")" << endl;
         
         for (auto &adjacent : adjList[vertex]) {
             int adjVertex = adjacent.first;
-            int capacity = adjacent.second;
+            int latency = adjacent.second;
             
             if (!visited[adjVertex]) {
-                cout << "  → Potential spread to Junction " << adjVertex 
-                     << " (" << junctionNames[adjVertex] 
-                     << ") - Capacity: " << capacity << " GPM" << endl;
+                cout << "  → Connection to Node " << adjVertex 
+                     << " (" << nodeNames[adjVertex] 
+                     << ") - Latency: " << latency << " ms" << endl;
                 inspectNetworkUtil(adjVertex, visited);
             }
         }
     }
 
-    // BFS for analyzing service areas
+    // BFS for analyzing network coverage
     void analyzeCoverage(int startVertex) {
         vector<bool> visited(SIZE, false);
         queue<int> q;
@@ -97,75 +97,119 @@ public:
         visited[startVertex] = true;
         q.push(startVertex);
 
-        cout << "Layer-by-Layer Network Inspection (BFS) from Junction " << startVertex 
-             << " (" << junctionNames[startVertex] << "):" << endl;
-        cout << "Purpose: Analyzing service areas by distance from source" << endl;
+        cout << "Layer-by-Layer Network Inspection (BFS) from Node " << startVertex 
+             << " (" << nodeNames[startVertex] << "):" << endl;
+        cout << "Purpose: Analyzing network reachability by hop distance" << endl;
         cout << "========================================" << endl;
 
         while (!q.empty()) {
             int vertex = q.front();
             q.pop();
             
-            cout << "Checking Junction " << vertex 
-                 << " (" << junctionNames[vertex] << ")" << endl;
+            cout << "Checking Node " << vertex 
+                 << " (" << nodeNames[vertex] << ")" << endl;
 
             for (auto &adjacent : adjList[vertex]) {
                 int adjVertex = adjacent.first;
-                int capacity = adjacent.second;
+                int latency = adjacent.second;
                 
                 if (!visited[adjVertex]) {
                     visited[adjVertex] = true;
                     q.push(adjVertex);
                     
-                    cout << "  → Next service area: Junction " << adjVertex 
-                         << " (" << junctionNames[adjVertex] 
-                         << ") - Capacity: " << capacity << " GPM" << endl;
+                    cout << "  → Next hop: Node " << adjVertex 
+                         << " (" << nodeNames[adjVertex] 
+                         << ") - Latency: " << latency << " ms" << endl;
                 }
             }
         }
     }
+
+    // Dijkstra's algorithm to find shortest paths
+    void dijkstra(int startVertex) {
+        // Vector to store distances from start vertex
+        vector<int> dist(SIZE, INT_MAX);
+        
+        // Priority queue to pick minimum distance vertex
+        // Pair: (distance, vertex)
+        priority_queue<Pair, vector<Pair>, greater<Pair>> pq;
+        
+        // Distance to start vertex is 0
+        dist[startVertex] = 0;
+        pq.push(make_pair(0, startVertex));
+        
+        while (!pq.empty()) {
+            int u = pq.top().second;
+            pq.pop();
+            
+            // Visit all adjacent vertices
+            for (auto &adjacent : adjList[u]) {
+                int v = adjacent.first;
+                int weight = adjacent.second;
+                
+                // If there's a shorter path to v through u
+                if (dist[u] != INT_MAX && dist[u] + weight < dist[v]) {
+                    dist[v] = dist[u] + weight;
+                    pq.push(make_pair(dist[v], v));
+                }
+            }
+        }
+        
+        // Print shortest paths
+        cout << "Shortest path from node " << startVertex << ":" << endl;
+        for (int i = 0; i < SIZE; i++) {
+            cout << startVertex << " -> " << i << " : " << dist[i] << endl;
+        }
+    }
+
 };
 
 int main() {
-    // Junction names for the water pipeline network
-    vector<string> junctionNames = {
-        "Pump Station",          // 0
-        "Distribution Hub",      // 1
-        "Reservoir",             // 2
-        "Treatment Plant",       // 3
-        "Storage Tank",          // 4
-        "Distribution Hub",      // 5
-        "Control Valve",         // 6
-        "Storage Tank",          // 7
-        "Pump Station"           // 8
+    // Node names for the computer network
+    vector<string> nodeNames = {
+        "Main Server",           // 0
+        "Router A",              // 1
+        "Router B",              // 2
+        "Database Server",       // 3
+        "Backup Server",         // 4
+        "Load Balancer",         // 5
+        "Firewall",              // 6
+        "Cache Server",          // 7
+        "Edge Server"            // 8
     };
 
-    // Create water pipeline network edges (junction pairs with capacity in GPM)
+    // Create computer network edges (node pairs with latency in milliseconds)
     vector<Edge> edges = {
-        {0,1,800},{0,2,2100},{1,2,600},{2,7,1100},{2,8,800},
-        {3,1,500},{3,4,900},{4,1,400},{4,3,900},
-        {5,6,1000},{5,7,1500},{5,8,500},
-        {6,5,1000},{6,7,300},{6,8,700},
-        {7,6,300},{7,5,1500},{7,2,1100},
-        {8,5,500},{8,6,700},{8,2,800}
+        {0,1,8},{0,2,21},{1,2,6},{2,7,11},{2,8,8},
+        {3,1,5},{3,4,9},{4,1,4},{4,3,9},
+        {5,6,10},{5,7,15},{5,8,5},
+        {6,5,10},{6,7,3},{6,8,7},
+        {7,6,3},{7,5,15},{7,2,11},
+        {8,5,5},{8,6,7},{8,2,8}
     };
 
-    // Create the water pipeline network graph
-    Graph network(edges, junctionNames);
+    // Create the computer network graph
+    Graph network(edges, nodeNames);
 
     // Display the network topology
     network.printNetwork();
 
     cout << endl;
 
-    // Perform network inspection using DFS from Junction 0 (Pump Station)
+    // Perform network inspection using DFS from Main Server
     network.inspectNetwork(0);
 
     cout << endl;
 
-    // Analyze service coverage using BFS from Junction 0 (Pump Station)
+    // Analyze network coverage using BFS from Main Server
     network.analyzeCoverage(0);
+
+    cout << endl;
+
+    // Find shortest paths using Dijkstra's algorithm from Main Server
+    network.dijkstra(0);
 
     return 0;
 }
 
+// Step 4 complete
