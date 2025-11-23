@@ -46,15 +46,14 @@ public:
 
     // DFS helper function using recursion
     void DFSUtil(int vertex, vector<bool> &visited) {
-        // Mark current vertex as visited
-        visited[vertex] = true;
-        cout << vertex << " ";
-
-        // Recur for all adjacent vertices
-        for (auto &adjacent : adjList[vertex]) {
-            int adjVertex = adjacent.first;
-            if (!visited[adjVertex]) {
-                DFSUtil(adjVertex, visited);
+    visited[vertex] = true;  // "I'm at vertex now, mark it"
+    cout << vertex << " ";
+    
+    // "Let me check who I can visit from here"
+    for (auto &adjacent : adjList[vertex]) {  // Look at neighbors
+        int adjVertex = adjacent.first;
+        if (!visited[adjVertex]) {  // "Have I been there?"
+            DFSUtil(adjVertex, visited);  // "Nope! Let's go there!"
             }
         }
     }
@@ -124,9 +123,9 @@ int main() {
 
     cout << endl;
 
-    graph.DFS(0);
+    graph.DFS(0); // start from vertex 0
     
-    graph.BFS(0);
+    graph.BFS(0); // start from vertx 0 again
 
     return 0;
 }
